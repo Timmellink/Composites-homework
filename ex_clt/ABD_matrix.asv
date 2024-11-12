@@ -1,0 +1,17 @@
+function ABD = ABD_matrix(C_r, z)
+    % ABD_matrix returns ABD matrix
+    %
+    % Arguments:
+    %   C_r : cell array of size n with stiffness matrices in ply CS
+    %   z   : Array with size n+1 with location of ply edges
+    %
+    % Returns:
+    %   ABD : ABD matrix
+    A = zeros(3);
+    B = zeros(3);
+    C = zeros(3);
+    if length(z) - 1 == length(C_r)
+        for i=1:length(C_r)
+            A = A + C_r{1}*
+
+

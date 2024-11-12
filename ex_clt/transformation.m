@@ -1,4 +1,4 @@
-function [T] = trnsfrm_matrix(theta)
+function [T] = transformation(theta)
 m = cosd(theta);
 n = sind(theta);
 a11 = m^2;
