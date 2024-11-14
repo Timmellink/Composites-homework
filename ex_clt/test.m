@@ -5,8 +5,8 @@ E1 = 128e9;
 E2 = 9e9;
 nu12 = 0.35;
 G12 = 5e9;
-t = 0.15e-3;
-layup = [0,45,90,-45]; %symmetric
+t = 0.15e-3; % thickness layer
+layup = [0,45,90,-45]; % symmetric
 kx = 0.01; % 1/m
 %% calculate ABD
 % first, calculate ply edges,
@@ -35,5 +35,16 @@ d = abd(4:6,4:6);
 %g = b*k0;
 %N = b*k0/(b^2-a*d);
 %M = k0/(-b^2/a+d);
-M = -inv(inv(a)*b-inv(b)*d)*inv(b)*k0;
-N = inv(b)*(k0-d*M);
+M = -((a\b)-(b\d))\(b\k0);
+N = b\(k0-d*M);
+%% Calculate sigma1* in first layer
+% at first layer eps*1 can be calculated
+% eps1* = eps0 + z*k
+% where z = -h/1+i*t, where i = 1
+% Then calculate sig*1 with sig*1 = [C*}1*{eps*1}
+h = n*t; % height composite
+i_pos = 1; % layer number
+z_pos = -h/2 + i_pos*t;
+eps_0 = [0; 0; 0];
+eps_st1 = eps_0 + z_pos*k0;
+sig_st1 = C_array{1}*eps_st1;
