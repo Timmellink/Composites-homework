@@ -11,13 +11,12 @@ for i = 1:length(theta_M)
     C_st = Cstar(C,theta_M(i));
     array{i}=C_st;
 end
-
 % next, calculate C*s for bottom half (z: <0,h/2>)
 % first, flip theta_matrix
 theta_matrix_flip = flip(theta_M);
-k = length(theta_M); % loop counter
+k = length(theta_M); % start from i = end of last position
 for i = 1:length(theta_matrix_flip)
     C_st = Cstar(C,theta_matrix_flip(i));
-    array{k+i} = C_st;
+    array{k+i} = C_st; % add C* to cell array
 end
 end
