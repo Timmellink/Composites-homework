@@ -23,20 +23,13 @@ abd = inv(ABD);
 %Nx = kx/abd(1,4)/(1-abd(4,4)*abd(1,1)/(abd(1,4)^2));
 %Mx = -abd(1,1)/abd(1,4)*Nx;
 %% calculate N and M, using submatrices
-% N = b*k0/(b^2-ad)
-% M = k0/(-b^2/a+d)
-% k0 is a vector, k0 = {kx; ky; kxy}. Assume ky = kxy = 0
 k0 = [kx; 0; 0];
 % extract submatrices from abd matrix
 b = abd(1:3,4:6);
 a = abd(1:3,1:3);
 d = abd(4:6,4:6);
-%f = b^2-a*d;
-%g = b*k0;
-%N = b*k0/(b^2-a*d);
-%M = k0/(-b^2/a+d);
-M = -((a\b)-(b\d))\(b\k0);
-N = b\(k0-d*M);
+M = ((b\d)-(a\b))\(b\k0);
+N = -(a\b)*M;
 %% Calculate sigma1* in first layer
 % at first layer eps*1 can be calculated
 % eps1* = eps0 + z*k
