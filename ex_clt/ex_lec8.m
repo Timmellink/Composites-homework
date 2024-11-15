@@ -8,6 +8,9 @@ G12 = 5e9;
 t = 0.15e-3; % thickness layer
 layup = [0,45,90,-45]; % symmetric
 kx = 0.01; % 1/m
+eps_0 = [0; 0; 0];
+N_app = [0; 0; 0];
+M_app = [0; 200; 0];
 %% calculate ABD
 % first, calculate ply edges,
 % then, create cell array of rotated stiffness matrices C*
@@ -35,9 +38,21 @@ N = -(a\b)*M;
 % eps1* = eps0 + z*k
 % where z = -h/1+i*t, where i = 1
 % Then calculate sig*1 with sig*1 = [C*}1*{eps*1}
+sig_st = cell(1,n); % stress distribution cell array
 h = n*t; % height composite
-i_pos = 1; % layer number
-z_pos = -h/2 + i_pos*t;
-eps_0 = [0; 0; 0];
-eps_st1 = eps_0 + z_pos*k0;
-sig_st1 = C_array{1}*eps_st1;
+eps_k = abd*[N;M];
+k = eps_k(4:6); % extracting k vector
+for i_pos=1:n
+    %i_pos = 1; % layer number
+    z_pos = -h/2 + i_pos*t;
+    eps_st_i = eps_0 + z(i_pos)*k; % epsilon at start layer
+    eps_st_i_N = eps_0 + z(i_pos+1)*k; % epsilon at end layer
+    sig_st_i = C_array{i_pos}*eps_st_i; % stress at start layer
+    sig_st_i_N = C_array{i_pos}*eps_st_i_N; % stress at end layer
+    sig_st{i_pos} = {sig_st_i, sig_st_i_N};
+end
+%% plot stress distribution
+% plot stress in 1* and 2* direction
+% first plot stress in 1* direction 
+% as a test, scatter plot the 1* direction stress in first layer
+scatter([sig_st{1,1}{1,1}(1), sig_st{1,1}{1,2}(1)],[z(1),z(2)]);
