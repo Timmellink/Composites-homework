@@ -1,8 +1,8 @@
-function array = Cstar_laminate(theta_M,n,E1,E2,nu12,G12)
+function array = Cstar_laminate(theta_M,C,n)
 % return cell array of c* matrices
 
 %% Calculate params 
-C = stiffness(E1,E2,nu12,G12);
+%C = stiffness(E1,E2,nu12,G12);
 array = cell(1,n); % set up array
 
 %% fill array of C*s

@@ -19,6 +19,7 @@ n = length(layup)*2; % number of layers
 z = ply_edges(t,n); % ply edges array
 C_array = Cstar_laminate(layup,n,E1,E2,nu12,G12); % rotated matrices cell array
 ABD = ABD_matrix(C_array,z);
+ABD = round(ABD,4);
 %% calculate abd
 abd = inv(ABD);
 %% calculate N and M, all deformations are zero
@@ -27,6 +28,9 @@ abd = inv(ABD);
 %Mx = -abd(1,1)/abd(1,4)*Nx;
 %% calculate N and M, using submatrices
 k0 = [kx; 0; 0];
+eps0 = [0; 0; 0];
+eps_k0 = [eps0;k0];
+NM = ABD*eps_k0;
 % extract submatrices from abd matrix
 b = abd(1:3,4:6);
 a = abd(1:3,1:3);
