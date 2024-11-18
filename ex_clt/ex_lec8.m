@@ -64,4 +64,7 @@ sig_st_fl = flip(sig_st);
 for i=1:n
     plot([sig_st_fl{i}{2}(1), sig_st_fl{i}{1}(1)],[abs(x(i)),abs(x(i+1))],'-bo');
 end
+for i=1:n
+    plot([sig_st_fl{i}{2}(2), sig_st_fl{i}{1}(2)],[abs(x(i)),abs(x(i+1))],'-ro');
+end
 hold off
