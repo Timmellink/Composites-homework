@@ -40,7 +40,7 @@ N = -(a\b)*M;
 % Then calculate sig*1 with sig*1 = [C*}1*{eps*1}
 sig_st = cell(1,n); % stress distribution cell array
 h = n*t; % height composite
-eps_k = abd*[N;M];
+eps_k = ABD\[N_app;M_app];
 k = eps_k(4:6); % extracting k vector
 for i_pos=1:n
     %i_pos = 1; % layer number
@@ -52,7 +52,16 @@ for i_pos=1:n
     sig_st{i_pos} = {sig_st_i, sig_st_i_N};
 end
 %% plot stress distribution
+close all
 % plot stress in 1* and 2* direction
 % first plot stress in 1* direction 
 % as a test, scatter plot the 1* direction stress in first layer
-scatter([sig_st{1,1}{1,1}(1), sig_st{1,1}{1,2}(1)],[z(1),z(2)]);
+% now plot 1* direction for each layer in the same graph
+% plot stress from start to end position
+hold on
+x = linspace(0,h,n+1); % height of laminate subdivided in n+1 elements
+sig_st_fl = flip(sig_st);
+for i=1:n
+    plot([sig_st_fl{i}{2}(1), sig_st_fl{i}{1}(1)],[abs(x(i)),abs(x(i+1))],'-bo');
+end
+hold off
