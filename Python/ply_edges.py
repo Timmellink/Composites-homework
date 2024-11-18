@@ -1,5 +1,5 @@
 import numpy as np
-def ply_edges(h,n)
+def ply_edges(h,n):
     # ply edges returns ply top and bottom surface locations
     #
     # Arguments:

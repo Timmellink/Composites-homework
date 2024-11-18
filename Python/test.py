@@ -1,5 +1,6 @@
 import numpy as np
 import Cstar as cs
+import Cstar2 as cs2
 import stiffness as s
 # parameters
 E1 = 128e9;
@@ -9,7 +10,7 @@ G12 = 5e9;
 theta = 45;
 
 C = s.stiffness(E1,E2,nu12,G12)
-Cst = cs.Cstar(C,theta)
+Cst = cs2.Cstar(C,theta)
 A = np.array([[2, 4], [5, -6]])
 B = np.array([[9, -3], [3, 6]])
 #C = A + B      # element wise addition
