@@ -27,28 +27,17 @@ C_array = csl.Cstar_laminate(layup, C, n)  # rotated matrices list
 ABD = ab.ABD_matrix(C_array, z)
 ABD = np.round(ABD, 4)
 
-'''
+
 # calculate abd
 abd = np.linalg.inv(ABD)
 
 # calculate N and M, all deformations are zero
-# from the calculations in my notebook
-# Nx = kx/abd[0, 3]/(1-abd[3, 3]*abd[0, 0]/(abd[0, 3]**2))
-# Mx = -abd[0, 0]/abd[0, 3]*Nx
-
-# calculate N and M, using submatrices
+# calculate N and M, by NM = ABD * eps_k0
 k0 = np.array([kx, 0, 0])
 eps0 = np.array([0, 0, 0])
 eps_k0 = np.concatenate((eps0, k0))
 NM = ABD @ eps_k0
-
-# extract submatrices from abd matrix
-#b = abd[0:3, 3:6]
-#a = abd[0:3, 0:3]
-#d = abd[3:6, 3:6]
-#M = np.linalg.solve(b, np.linalg.solve(d, b @ k0))
-#N = -np.linalg.solve(a, b) @ M
-
+'''
 # Calculate sigma1* in first layer
 # at first layer eps*1 can be calculated
 # eps1* = eps0 + z*k
@@ -59,7 +48,7 @@ h = n * t  # height composite
 eps_k = np.linalg.solve(ABD, np.concatenate((N_app, M_app)))
 k = eps_k[3:6]  # extracting k vector
 for i_pos in range(n):
-    z_pos = -h / 2 + (i_pos + 1) * t
+    z_pos = -h/2 + (i_pos + 1) * t
     eps_st_i = eps_0 + z[i_pos] * k  # epsilon at start layer
     eps_st_i_N = eps_0 + z[i_pos + 1] * k  # epsilon at end layer
     sig_st_i = C_array[i_pos] @ eps_st_i  # stress at start layer
