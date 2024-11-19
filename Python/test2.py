@@ -37,7 +37,7 @@ k0 = np.array([kx, 0, 0])
 eps0 = np.array([0, 0, 0])
 eps_k0 = np.concatenate((eps0, k0))
 NM = ABD @ eps_k0
-'''
+
 # Calculate sigma1* in first layer
 # at first layer eps*1 can be calculated
 # eps1* = eps0 + z*k
@@ -68,4 +68,3 @@ for i in range(n):
     plt.plot([sig_st_fl[i][1][0], sig_st_fl[i][0][0]], [abs(x[i]), abs(x[i + 1])], '-bo')
 for i in range(n):
     plt.plot([sig_st_fl[i][1][1], sig_st_fl[i][0][1]], [abs(x[i]), abs(x[i + 1])], '-ro')
-'''
