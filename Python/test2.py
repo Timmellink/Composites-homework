@@ -27,6 +27,7 @@ C_array = csl.Cstar_laminate(layup, C, n)  # rotated matrices list
 ABD = ab.ABD_matrix(C_array, z)
 ABD = np.round(ABD, 4)
 
+'''
 # calculate abd
 abd = np.linalg.inv(ABD)
 
@@ -78,4 +79,4 @@ for i in range(n):
     plt.plot([sig_st_fl[i][1][0], sig_st_fl[i][0][0]], [abs(x[i]), abs(x[i + 1])], '-bo')
 for i in range(n):
     plt.plot([sig_st_fl[i][1][1], sig_st_fl[i][0][1]], [abs(x[i]), abs(x[i + 1])], '-ro')
-
+'''

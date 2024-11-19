@@ -19,5 +19,5 @@ def ABD_matrix(C_r, z):
             B += C_r[i] / 2 * (z[i + 1]**2 - z[i]**2)
             D += C_r[i] / 3 * (z[i + 1]**3 - z[i]**3)
     
-    ABD = np.block([[A, B], [B, D]])
+    ABD = np.array([[A, B], [B, D]])
     return ABD
