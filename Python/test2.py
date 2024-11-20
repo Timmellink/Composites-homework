@@ -1,3 +1,4 @@
+# %% imports
 import numpy as np
 import matplotlib.pyplot as plt
 import ply_edges as pl
@@ -55,13 +56,14 @@ for i_pos in range(n):
     sig_st_i_N = C_array[i_pos] @ eps_st_i_N  # stress at end layer
     sig_st[i_pos] = (sig_st_i, sig_st_i_N)
 
-# %%plot stress distribution
+# %% Plot stress distribution
 plt.close('all')
 # plot stress in 1* and 2* direction
 # first plot stress in 1* direction 
 # as a test, scatter plot the 1* direction stress in first layer
 # now plot 1* direction for each layer in the same graph
 # plot stress from start to end position
+#plt.figure()
 x = np.linspace(0, h, n + 1)  # height of laminate subdivided in n+1 elements
 sig_st_fl = sig_st[::-1]
 for i in range(n):

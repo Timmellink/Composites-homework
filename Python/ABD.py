@@ -1,14 +1,26 @@
 import numpy as np
 
 def ABD_matrix(C_r, z):
-    # ABD_matrix returns ABD matrix
-    #
-    # Arguments:
-    #   C_r : list of stiffness matrices in ply CS
-    #   z   : array with location of ply edges
-    #
-    # Returns:
-    #   ABD : ABD matrix
+    """
+     ABD_matrix returns ABD matrix
+    
+     Parameters
+     ----------
+     C_r : list 
+         list of stiffness matrices in ply CS
+     z   : array 
+         array with location of ply edges
+    
+     Returns
+     -------
+     ABD : matrix
+         ABD matrix
+    
+    Example
+    -------
+    >>> ABD_matrix(Cr,Z)
+    [[A B], [B D]]
+    """
     A = np.zeros((3, 3))
     B = np.zeros((3, 3))
     D = np.zeros((3, 3))
