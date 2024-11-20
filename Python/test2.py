@@ -4,7 +4,7 @@ import ply_edges as pl
 import Cstar_laminate as csl
 import stiffness as s
 import ABD as ab
-# params
+# %% params
 E1 = 128e9
 E2 = 9e9
 nu12 = 0.35
@@ -16,7 +16,7 @@ eps_0 = np.array([0, 0, 0])
 N_app = np.array([0, 0, 0])
 M_app = np.array([0, 200, 0])
 
-# calculate ABD
+# %% calculate ABD
 # first, calculate ply edges,
 # then, create list of rotated stiffness matrices C*
 # Finally, calculate ABD, using the first two
@@ -28,17 +28,17 @@ ABD = ab.ABD_matrix(C_array, z)
 ABD = np.round(ABD, 4)
 
 
-# calculate abd
+# %% calculate abd
 abd = np.linalg.inv(ABD)
 
-# calculate N and M, all deformations are zero
+# %% calculate N and M, all deformations are zero
 # calculate N and M, by NM = ABD * eps_k0
 k0 = np.array([kx, 0, 0])
 eps0 = np.array([0, 0, 0])
 eps_k0 = np.concatenate((eps0, k0))
 NM = ABD @ eps_k0
 
-# Calculate sigma1* in first layer
+# %% Calculate sigma1* in first layer
 # at first layer eps*1 can be calculated
 # eps1* = eps0 + z*k
 # where z = -h/1+i*t, where i = 1
@@ -55,7 +55,7 @@ for i_pos in range(n):
     sig_st_i_N = C_array[i_pos] @ eps_st_i_N  # stress at end layer
     sig_st[i_pos] = (sig_st_i, sig_st_i_N)
 
-# plot stress distribution
+# %%plot stress distribution
 plt.close('all')
 # plot stress in 1* and 2* direction
 # first plot stress in 1* direction 
