@@ -1,6 +1,6 @@
 # %% install packages
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import ply_edges as pl
 import Cstar_laminate as csl
 import stiffness as s
@@ -23,9 +23,15 @@ ABD = ab.ABD_matrix(Cr,z)
 ABD = np.round(ABD,4)
 # %% calculate abd, then calculate Ex, Ey, GXY using formulae
 abd =  np.linalg.inv(ABD)
-Ex = 1/(abd[1][1]*h) # Ex = 1/(a11*h) h is laminate thickness
-Ey = 1/(abd[2][2]*h) # Ey = 1/(a22*h)
-Gxy = 1/(abd[3][3]*h) # Gxy = 1/(a33*h)
+Ex = 1/(abd[0][0]*h) # Ex = 1/(a11*h) h is laminate thickness
+Ey = 1/(abd[1][1]*h) # Ey = 1/(a22*h)
+Gxy = 1/(abd[2][2]*h) # Gxy = 1/(a33*h)
 # %% flexular moduli 
-Efx = 12/(abd[4][4]*h**3) # Efx = 12/(d11*h^3)
-Efy = 12/(abd[5][5]*h**3) # Efy = 12/(d22*h^3)
+Efx = 12/(abd[3][3]*h**3) # Efx = 12/(d11*h^3)
+Efy = 12/(abd[4][4]*h**3) # Efy = 12/(d22*h^3)
+# %% print values
+print("Ex = "+str(Ex)+'\n')
+print("Ey = "+str(Ey)+'\n')
+print("Gxy = "+str(Gxy)+'\n\n')
+print("Efx = "+str(Efx)+'\n')
+print("Efy = "+str(Efy)+'\n')
