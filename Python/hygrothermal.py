@@ -29,12 +29,9 @@ def hygrothermal(alpha, theta_matrix, n):
    # array = np.zeros(n)
     # %% fill array with alpha*s
     # first calculate alpha*s from top half (z=-h/2 to z=0)
-    array = [a.alpha_star(alpha,x) for x in theta_matrix ]    
-    """
-    for i in theta_matrix:
-        alpha_st = a.alpha_star(alpha,i)
-        array()
-    """
-    y = theta_matrix[:,-1]
-    array2 = [a.alpha_star(alpha,x) for x in y]
-    
+    array1 = [a.alpha_star(alpha,x) for x in theta_matrix ] # list comprehension for first half
+    array1 = np.array(array1) # convert into numpy array
+    y = theta_matrix[::-1] # flip array of angles
+    array2 = [a.alpha_star(alpha,x) for x in y] # list comprehension for bottom half
+    array = np.append(array1,array2,axis=1) # append second array onto first array (row direction)
+    return array
