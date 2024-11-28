@@ -1,6 +1,6 @@
 import numpy as np
 def transformation(theta):
-    theta = theta/180*np.pi
+    theta = theta/180*np.pi # convert to radians
     m = np.cos(theta)
     n = np.sin(theta)
     a11 = m**2
