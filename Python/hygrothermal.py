@@ -7,7 +7,7 @@ Created on Mon Nov 25 11:28:15 2024
 
 import numpy as np
 import alpha_star as a
-def hygrothermal(alpha, theta_matrix, n):
+def alpha_star(alpha, theta_matrix, n):
     """
     
 
