@@ -14,6 +14,7 @@ import alpha_star_laminate as asl
 import thermal_effects as th
 import epsilon_star_laminate as esl
 import matplotlib.pyplot as plt
+
 # %% set parameters
 E1 = 128e9
 E2 = 9e9
@@ -28,6 +29,7 @@ layup = [0,45,90,-45]
 n = len(layup)*2
 h = t*n
 x = np.linspace(0, h, n + 1)  # height of laminate subdivided in n+1 elements
+
 # %% Calculate alpha star cell array
 # first calculate C, then calculate Cstar laminate
 # Then, one can calculate alpha star cell array
@@ -35,10 +37,12 @@ C = s.stiffness(E1,E2,nu12,G12)
 Cstar_lam = cs.Cstar_laminate(layup,C,n)
 z = pl.ply_edges(t,n)
 alpha_array = asl.alpha_star_laminate(alph,layup)
+
 # %% calculate Nth and Mth by using th_effects
 NMth = th.thermal_effects(Cstar_lam,delta,alpha_array,z)
 NMth = np.round(NMth, 7)
 print("The thermal forces Nth and Mth are: "+str(NMth))
+
 # %%  calculate epsilon and kappa
 # first, calculate abd matrix
 ABD_M = ab.ABD_matrix(Cstar_lam, z)
@@ -49,6 +53,7 @@ force = np.sum((NMth,NM),axis=0)
 epsk0 = abd@force # material CS
 epsk0 = np.round(epsk0,6)
 print("The deformations are: "+str(epsk0))
+
 #%% calculate stress in each layer, in ply CS
 # to do this, iterate over the layers, multiplying 
 # [C*]*({eps*}-{alpha*}*deltaT)
@@ -61,6 +66,7 @@ for i in range(n):
     sig_k_e = Cstar_lam[i]@(eps0+z[i+1]*kappa-alpha_array[i]*delta)
     stresses.append([sig_k_b,sig_k_e])
 stresses = np.array(stresses)
+
 # %% plot
 str1 = stresses[:,:,0] # stresses in 1 direction
 str1_lie = np.reshape(str1, (-1))  # get the stresses in one row
