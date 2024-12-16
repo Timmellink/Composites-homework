@@ -1,0 +1,8 @@
+tested layup : [45, 0, -45, 90, 45, 0, -45, 90, 45, 0, -45, 90]moment : Mx
+Failure load : 700N
+ply that failed : 22
+
+tested layup : [45, 0, -45, 90, 45, 0, -45, 90, 45, 0, -45, 90], moment : My
+Failure load : 650N
+ply that failed : 20
+

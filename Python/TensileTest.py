@@ -5,7 +5,7 @@ Created on Thu Dec  5 17:14:37 2024
 @author: Timme
 """
 # %% import statements
-import composite_properties as cp
+import CompositeProperties as cp
 import numpy as np
 import thermal_effects as te
 import importlib as il
@@ -58,28 +58,36 @@ print("nu_xy : ",str(nuxy))
 
 # %% calculate stresses in ply CS function
 Fx = 50e3 # Fx = 50kN
-def CalculateStress(force):
+def CalculateStress(NM,Cstar_laminate,z):
     """
     Calculate stresses in plies in ply CS
 
     Parameters
     ----------
-    force : scalar
-        force in newtons
-    
+    NM : vector
+        Vector of forces and moments per unit width 
+    Cstar_laminate : array
+        array of C*s
+    z : array
+        edges of plies
+    abd : matrix
+        inverse ABD matrix
+
     Returns
     -------
     stresses : array
         (3,n)-dimensional array. Array of stresses in ply CS in 1,2, and 6-direction
 
     """
-    FxW = force/W # force normalized with width
-    NM = [FxW, 0, 0, 0, 0, 0] # F = {Fx; Fy; Fxy}
-    epsk0 = abd@NM # epsk0 = abd@F
+    n = len(z)-1 # n is the number of plies
+    ABD = cp.ABD_matrix(Cstar_laminate, z)# Calculate ABD matrix
+    abd = np.linalg.inv(ABD) # calculate abd    
+    epsk0 = abd@NM # Determine eps_k0 based on this load NM, epsk0 = abd@F
+    # Get sigma* by determining sig* = C*lam (eps0 + z k0)  
     eps0 = epsk0[0:3] # eps0 = epsk0[0:3]
     k0 = epsk0[3:6] # k0 = epsk0[3:6]
     stresses = []
-    # sigma_i = C*[i]@(eps0+z[i]*k0)
+    # sigma_i_star = C*[i]@(eps0+z[i]*k0)
     for i in range(n):
         sig_k_b = Cstar_laminate[i]@(eps0+z[i]*k0) # start stress
         sig_k_e = Cstar_laminate[i]@(eps0+z[i+1]*k0) # end stress
@@ -99,13 +107,13 @@ plt.plot(str1Row,xdRow[1:-1]) #plot from top to bottom (only take begin and end 
 """
 
 # %% rotate back to material CS function
-def RotateMaterial(stresses, layup):
+def RotateMaterial(sig_star, layup):
     """
     Rotate stresses back to material CS
 
     Parameters
     ---------
-    stresses : array
+    sig_star : array
         stresses in ply CS in 1,2 and 6 direction
     layup : array
         layup of angles in laminate of one half.
@@ -117,21 +125,21 @@ def RotateMaterial(stresses, layup):
     """
 
     layup_laminate = layup+layup[::-1] # total layup 
-    str_b = stresses[:,0,:] # stresses at beginning of plies
-    str_e = stresses[:,1,:] # stresses at end of plies
+    str_b = sig_star[:,0,:] # stresses at beginning of plies
+    str_e = sig_star[:,1,:] # stresses at end of plies
     MaterialStresses = []
     for i in range(n):
-        str_m = cp.transformation(layup_laminate[i])@str_b[i] # get stresses in material CS
-        str_mEnd = cp.transformation(layup_laminate[i])@str_e[i] # get stresses in material CS
-        MaterialStresses.append([str_m,str_mEnd])
+        str_m = cp.transformation(layup_laminate[i])@str_b[i] # get start stress in material CS
+        str_mEnd = cp.transformation(layup_laminate[i])@str_e[i] # get end stress in material CS
+        MaterialStresses.append([str_m,str_mEnd]) # append to list
     MaterialStresses = np.array(MaterialStresses) # convert material stresses to numpy array
 
     return MaterialStresses
 
 # %% Run Tsai-Hill test function 
-def RunTest(Fx,layup,strength):
+def TsaiTest(Fx,layup,strength):
     """
-    Check per ply whether it fails
+    Check per ply whether it fails on Tsai-hill test
 
     Parameters
     ---------
@@ -149,7 +157,7 @@ def RunTest(Fx,layup,strength):
     """
     
     s1c,s1t,s2c,s2t,s6 = strength
-    stresses = CalculateStress(Fx)
+    stresses = CalculateStress(Fx,Cstar_laminate,z,abd,W)
     MaterialStresses = RotateMaterial(stresses,layup)
     Failures = []
     for StressArray in MaterialStresses:
@@ -160,16 +168,17 @@ def RunTest(Fx,layup,strength):
         Failures.append(fail)
     Failures = np.array(Failures) # convert to np array
     return Failures
-
+# %% Test whether plies fail
+""" 
 strength = (S1c,S1t,S2c,S2t,S6)
 fail = RunTest(Fx,layup,strength)
 n_lst = np.array(range(n))
 #Failures,MaterialStresses = RotateMaterial(stresses,layup)
 #print("The plies that fail are number(s) #", n_lst[Failures==True])
-str=CalculateStress(Fx)
+str=CalculateStress(Fx,Cstar_laminate,z,abd,W)
 MatStr = RotateMaterial(str,layup)
 print("The plies that fail are number(s) #", n_lst[fail==True])
-
+"""
 # %% plot number of plies that fail
 def PlyBreak(leftBound,rightBound,n,strength,layup):
     n_lst = np.array(range(n))
@@ -183,6 +192,7 @@ def PlyBreak(leftBound,rightBound,n,strength,layup):
     plt.plot(force_range,n_fail_lst)
     return 
 # %% plot stresses
+""" 
 plt.close()
 str1Material = MatStr[:,:,0] # stresses in 1 direction
 str1MaterialRow = np.reshape(str1Material, (-1))  # get the stresses in one row
@@ -199,3 +209,4 @@ str3Material = MatStr[:,:,2] # stresses in 3 direction
 str3MaterialRow = np.reshape(str3Material, (-1))  # get the stresses in one row
 plt.figure()
 plt.plot(str3MaterialRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+""" 

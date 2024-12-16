@@ -3,7 +3,7 @@
 
 
 import numpy as np
-from composite_properties import transformation as t
+from CompositeProperties import transformation as t
 
 
 
