@@ -41,11 +41,12 @@ h = cd['t']*n # laminate thickness
 df.plot(x="disp",y="force")
 
 # %% calculate slope m
-disp1 = 1; disp3 = 3
+disp1 = 0.1; disp3 = 3.5
 df1 = df[df.disp==disp1] # find force at disp = 1.0
 Fd1 = df1.force.squeeze() # squeeze() to get a scalar value
 df3 = df[df.disp==disp3] # find force at disp = 3.0
 Fd3 = df3.force.squeeze()
+
 # calculate slope m = delta F/delta d
 delta_F = Fd3-Fd1 # delta F = Fd3 - Fd1
 delta_d = disp3-disp1 # delta d = 3 - 1
@@ -53,7 +54,7 @@ m = delta_F/delta_d
 
 
 # %% calculate flexural stiffness
-Efs = (Ls*1e-3)**3*m/(4*b_s*1e-3*(h*1e-3)**3) # Secant stiffness is L^3m/4bh^3 (see standard) 
+Efs = (Ls*1e3)**3*m/(4*b_s*1e3*(h*1e3)**3) # Secant stiffness is L^3m/4bh^3 (see standard) 
 
 # %% to compare flexural modulus, one has to calculate Efx
 # This can be done by calculating abd
@@ -75,11 +76,11 @@ Efx2 = 12/(abd2[3][3]*h**3)
 Efy2 = 12/(abd2[4][4]*h**3)
 
 # %% compare the values
-print("The found bending stiffness Efs : ", Efs)
+print("The found bending stiffness Efs [MPa]: ", Efs)
 print("The calculated Efx,1, Efy,1 : ", Efx, ", ", Efy)
 print("The calculated EFx,2, Efy,2 : ",Efx2, ", ", Efy2)
 
-# %% Max failure load
+# %% A1. layup 1, Fx Max failure load
 # Get NM, first determine for layup 1 with Mx
 F = 700
 Mx = F*Ls/(4*b_s)# Mx = F L / 4 b
@@ -127,28 +128,101 @@ def MaxStress(sig,strength):
     return fail_ply,Failures
 fail_ply,fails =  MaxStress(sig,sd) # determine failure ply and fail tests
 
-# %% Determine failure ply for layup 1 My
+# %% A2. Determine failure ply for layup 1 My
 # calculate NM1y
-F1y = 650
-My = F1y*Ls/(4*b_s)# Mx = F L / 4 b
-NM1y = [0, 0, 0, 0, My, 0]# set NM for this load case
-sig_star_1y = tt.CalculateStress(NM1y,C_star_laminate,z) # Use function stresses with C*lam1 to get sigma*
+F1y = 110
+M1y = F1y*Ls/(4*b_s)# Mx = F L / 4 b
+NM1y = [0, 0, 0, 0, M1y, 0]# set NM for this load case
+sig_star_1y = tt.CalculateStress(NM1y,Cstar_lam2,z) # Use function stresses with C*lam1 to get sigma*
 sig_1y = tt.RotateMaterial(sig_star_1y,layup1)# rotate stresses to material CS
+print("Tested force (F1y): ",str(F1y), "N")
 fail_ply_1y,fails_1y =  MaxStress(sig_1y,sd) # determine failure ply and fail tests
 
-# %% Report on found values layup1, Mx
+# %% A3. Determine failure ply for layup 2 Mx
+# calculate NM2x
+F2x = 208
+M2x = F2x*Ls/(4*b_s)# Mx = F L / 4 b
+NM2x = [0, 0, 0, M2x, 0, 0]# set NM for this load case
+sig_star_2x = tt.CalculateStress(NM2x,C_star_laminate,z) # Use function stresses with C*lam1 to get sigma*
+sig_2x = tt.RotateMaterial(sig_star_2x,layup2)# rotate stresses to material CS
+print("Tested force (F2x): ",str(F2x), "N")
+fail_ply_2x,fails_2x =  MaxStress(sig_2x,sd) # determine failure ply and fail tests
+
+# %% A4. Determine failure ply for layup 2 My
+# calculate NM2y
+F2y = 500
+M2y = F2y*Ls/(4*b_s) # My = F L / 4 b
+NM2y = [0, 0, 0, 0, M2y, 0]# set NM for this load case
+sig_star_2y = tt.CalculateStress(NM2y,Cstar_lam2,z) # Use function stresses with C*lam1 to get sigma*
+sig_2y = tt.RotateMaterial(sig_star_2y,layup2)# rotate stresses to material CS
+print("Tested force (F2y): ",str(F2y), "N")
+fail_ply_2y,fails_2y =  MaxStress(sig_2y,sd) # determine failure ply and fail tests
+
+
+# %% R1. Report on found values layup1, Mx
 f = open("FailureTests3PB.txt", "a")# create new txt file
 f.write("tested layup : "+str(layup1)+", moment : Mx")# will record tested layup and which moment (Mx or My)
 f.write("\nFailure load : "+str(F)+"N")# Record failure load
 f.write("\nply that failed : "+str(fail_ply)+"\n\n")# Record which ply fails first
 f.close()# close file
 
-# %% Report on found values layup1, My
-f = open("FailureTests3PB.txt", "a")# create new txt file
+# %% R2. Report on found values layup1, My
+f = open("FailureTests3PB.txt", "a")# append to txt file
 f.write("tested layup : "+str(layup1)+", moment : My")# will record tested layup and which moment (Mx or My)
 f.write("\nFailure load : "+str(F1y)+"N")# Record failure load
 f.write("\nply that failed : "+str(fail_ply_1y)+"\n\n")# Record which ply fails first
 f.close()# close file
 
+# %% R3. Report on found values layup2, Mx
+f = open("FailureTests3PB.txt", "a")# append
+f.write("tested layup : "+str(layup2)+", moment : Mx")# will record tested layup and which moment (Mx or My)
+f.write("\nFailure load : "+str(F2x)+"N")# Record failure load
+f.write("\nply that failed : "+str(fail_ply_2x)+"\n\n")# Record which ply fails first
+f.close()# close file
 
+# %% R4. Report on found values layup2, My
+f = open("FailureTests3PB.txt", "a")# append
+f.write("tested layup : "+str(layup2)+", moment : My")# will record tested layup and which moment (Mx or My)
+f.write("\nFailure load : "+str(F2y)+"N")# Record failure load
+f.write("\nply that failed : "+str(fail_ply_2y)+"\n\n")# Record which ply fails first
+f.close()# close file
+
+# %% plot stress in longitudinal direction (y direction)
+def PlotStress(MatStr, z, dir): 
+  """
+  Plots material stresses of laminate in a certain direction
+
+  Parameters
+  ----------
+  MatStr : matrix
+    2xn matrix of stresses in material CS
+  z : array
+    array of length n+1 of ply edges
+  dir : scalar
+    direction of desired stresses to plot (1,2 or 3)
+
+  Returns
+  -------
+  None
+
+  """
+  plt.close()
+  MatStrDir = MatStr[:,:,dir] # stresses in 1 direction
+  MatStrDirRow = np.reshape(MatStrDir, (-1))  # get the stresses in one row
+  xd = [[z,z]for z in z] # repeat the z coordinates twice
+  xdRow = np.reshape(xd,-1) # reshape to one row
+  plt.plot(MatStrDirRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+  return 
+PlotStress(sig_2y,z,2)
+""" 
+str2Material = MatStr[:,:,1] # stresses in 2 direction
+str2MaterialRow = np.reshape(str2Material, (-1))  # get the stresses in one row
+plt.figure()
+plt.plot(str2MaterialRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+
+str3Material = MatStr[:,:,2] # stresses in 3 direction
+str3MaterialRow = np.reshape(str3Material, (-1))  # get the stresses in one row
+plt.figure()
+plt.plot(str3MaterialRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+"""
 # %%

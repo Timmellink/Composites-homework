@@ -158,7 +158,7 @@ def Cstar_laminate(theta_array, C):
   #  for angle,index in zip(layup,range(n)):
   #      Cstar = Cstar(C, angle)
   #      array[index] = Cstar
-    array = np.round(array,6)
+    array = np.round(array,7)
     return array
 
 
@@ -198,5 +198,5 @@ def ABD_matrix(Carray, z):
     AB = np.concatenate((A,B),axis=1)
     BD = np.concatenate((B,D),axis=1)
     ABD = np.vstack((AB, BD))
-    ABD = np.round(ABD,7)
+    ABD = np.round(ABD,8)
     return ABD
