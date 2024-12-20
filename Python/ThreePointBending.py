@@ -80,13 +80,7 @@ print("The found bending stiffness Efs [MPa]: ", Efs)
 print("The calculated Efx,1, Efy,1 : ", Efx, ", ", Efy)
 print("The calculated EFx,2, Efy,2 : ",Efx2, ", ", Efy2)
 
-# %% A1. layup 1, Fx Max failure load
-# Get NM, first determine for layup 1 with Mx
-F = 700
-Mx = F*Ls/(4*b_s)# Mx = F L / 4 b
-NM1x = [0, 0, 0, Mx, 0, 0]# set NM for this load case
-sig_star = tt.CalculateStress(NM1x,C_star_laminate,z) # Use function stresses to get sigma*
-sig = tt.RotateMaterial(sig_star,layup1)# rotate stresses to material CS
+# %%
 # Run max stress test 
 def MaxStress(sig,strength):
     """
@@ -126,6 +120,14 @@ def MaxStress(sig,strength):
        print("No ply fails")
        fail_ply = [0]
     return fail_ply,Failures
+
+# %% A1. layup 1, Fx Max failure load
+# Get NM, first determine for layup 1 with Mx
+F = 700
+Mx = F*Ls/(4*b_s)# Mx = F L / 4 b
+NM1x = [0, 0, 0, Mx, 0, 0]# set NM for this load case
+sig_star = tt.CalculateStress(NM1x,C_star_laminate,z) # Use function stresses to get sigma*
+sig = tt.RotateMaterial(sig_star,layup1)# rotate stresses to material CS
 fail_ply,fails =  MaxStress(sig,sd) # determine failure ply and fail tests
 
 # %% A2. Determine failure ply for layup 1 My
@@ -188,14 +190,14 @@ f.write("\nply that failed : "+str(fail_ply_2y)+"\n\n")# Record which ply fails 
 f.close()# close file
 
 # %% plot stress in longitudinal direction (y direction)
-def PlotStress(MatStr, z, dir): 
+def PlotStress(PlyStr, z, dir): 
   """
   Plots material stresses of laminate in a certain direction
 
   Parameters
   ----------
-  MatStr : matrix
-    2xn matrix of stresses in material CS
+  PlyStr : matrix
+    2xn matrix of stresses in ply CS
   z : array
     array of length n+1 of ply edges
   dir : scalar
@@ -207,13 +209,14 @@ def PlotStress(MatStr, z, dir):
 
   """
   plt.close()
-  MatStrDir = MatStr[:,:,dir] # stresses in 1 direction
-  MatStrDirRow = np.reshape(MatStrDir, (-1))  # get the stresses in one row
+  PlyStrDir = PlyStr[:,:,dir] # stresses in a direction
+  PlyStrDirRow = np.reshape(PlyStrDir, (-1))  # get the stresses in one row
   xd = [[z,z]for z in z] # repeat the z coordinates twice
   xdRow = np.reshape(xd,-1) # reshape to one row
-  plt.plot(MatStrDirRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+  xdRow =  # reverse order
+  plt.plot(PlyStrDirRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
   return 
-PlotStress(sig_2y,z,2)
+PlotStress(sig_star_2y,z,0)
 """ 
 str2Material = MatStr[:,:,1] # stresses in 2 direction
 str2MaterialRow = np.reshape(str2Material, (-1))  # get the stresses in one row

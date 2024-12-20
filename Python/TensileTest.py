@@ -25,7 +25,7 @@ G12 = 5.1e9
 t = 0.15e-3 
 h=t*n
 # strength values
-S1t = 2250e6
+S1t = 2280e6
 S1c = 1300e6
 S2t = 110e6
 S2c = 130e6
@@ -37,24 +37,18 @@ Cstar_laminate = cp.Cstar_laminate(layup,C)# Calculate C star laminate
 z = cp.ply_edges(t,n)# Calculate ply edges z
 ABD = cp.ABD_matrix(Cstar_laminate,z)# calculate ABD
 abd = np.linalg.inv(ABD)# calcualte abd
-# %% print abd
-"""
-for i in abd:
-    print("\n")
-    for j in i:
-        print(f"{j:01} ", end="")
-"""
+
 # %% calculate values engineering constants
 Ex = 1/(abd[0][0]*h)# Ex = 1/(a11*h) h is laminate thickness
 Ey = 1/(abd[1][1]*h)# Ey = 1/(a22*h)
 Gxy = 1/(abd[2][2]*h)# Gxy = 1/(a33*h)
 nuxy = -(abd[1][0])/(abd[0][0]) # nuxy = -a21/a11
-"""
+
 print("Ex : ",str(Ex))
 print("Ey : ",str(Ey))
 print("Gxy : ",str(Gxy))
 print("nu_xy : ",str(nuxy))
-"""
+
 
 # %% calculate stresses in ply CS function
 def CalculateStress(NM,Cstar_laminate,z):
@@ -95,13 +89,16 @@ def CalculateStress(NM,Cstar_laminate,z):
 #stresses = CalculateStress(Fx)
 
 # %% plot ply CS stresses
-"""
+Fx = 50e3 # Fx = 50kN
+Nx = Fx/W # determine NM vector
+NM = [Nx, 0, 0, 0, 0, 0]
+stresses = CalculateStress(NM,Cstar_laminate,z)
 str1 = stresses[:,:,0] # stresses in 1 direction
 str1Row = np.reshape(str1, (-1))  # get the stresses in one row
 xd = [[z,z]for z in z] # repeat the elements twice
 xdRow = np.reshape(xd,-1) # reshape to one row
+plt.close()
 plt.plot(str1Row,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
-"""
 
 # %% rotate back to material CS function
 def RotateMaterial(sig_star, layup):
@@ -176,7 +173,7 @@ fail = TsaiTest(NM,layup,strength)
 n_lst = np.array(range(n))
 #Failures,MaterialStresses = RotateMaterial(stresses,layup)
 #print("The plies that fail are number(s) #", n_lst[Failures==True])
-stress=CalculateStress(NM,Cstar_laminate,strength)
+stress=CalculateStress(NM,Cstar_laminate,z)
 MatStr = RotateMaterial(stress,layup)
 print("The plies that fail are number(s) #", n_lst[fail==True])
 
@@ -193,14 +190,14 @@ def PlyBreak(leftBound,rightBound,n,strength,layup):
     plt.plot(force_range,n_fail_lst)
     return 
 # %% plot stresses
-""" 
+
 plt.close()
 str1Material = MatStr[:,:,0] # stresses in 1 direction
 str1MaterialRow = np.reshape(str1Material, (-1))  # get the stresses in one row
 xd = [[z,z]for z in z] # repeat the elements twice
 xdRow = np.reshape(xd,-1) # reshape to one row
 plt.plot(str1MaterialRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
-
+"""
 str2Material = MatStr[:,:,1] # stresses in 2 direction
 str2MaterialRow = np.reshape(str2Material, (-1))  # get the stresses in one row
 plt.figure()
@@ -210,4 +207,6 @@ str3Material = MatStr[:,:,2] # stresses in 3 direction
 str3MaterialRow = np.reshape(str3Material, (-1))  # get the stresses in one row
 plt.figure()
 plt.plot(str3MaterialRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
-""" 
+"""
+
+# %%
