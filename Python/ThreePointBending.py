@@ -40,7 +40,7 @@ n = len(layup1)*2 # number of plies
 h = cd['t']*n # laminate thickness
 
 # %% plot data
-df.plot(x="disp",y="force")
+#df.plot(x="disp",y="force")
 
 # %% calculate slope m
 disp1 = 0.1; disp3 = 3.5
@@ -83,7 +83,7 @@ print("The calculated Efx,1, Efy,1 : ", Efx, ", ", Efy)
 print("The calculated EFx,2, Efy,2 : ",Efx2, ", ", Efy2)
 
 # %% max stress test 
-def MaxStress(sig,strength):
+def MaxStressTest(sig,strength):
     """
     Check per ply whether it fails on MaxStress criterion
 
@@ -104,10 +104,16 @@ def MaxStress(sig,strength):
     """
     s1c,s1t,s2c,s2t,s6 = strength
     Failures = []
-    for StressArray in sig:
-        sig1 = max(StressArray[0][0],StressArray[1][0]) # get maximum stress in 1-direction of ply
-        sig2 = max(StressArray[0][1],StressArray[1][1]) # get max stress in 2 direction of ply
-        sig3 = max(StressArray[0][2],StressArray[1][2]) # get stress in 6-direction
+    for PlyStress in sig:
+        sig1 = max(abs(PlyStress[0][0]),abs(PlyStress[1][0])) # get maximum stress in 1-direction of ply
+        if -sig1 == min(PlyStress[0][0],PlyStress[1][0]): # value was negative
+          sig1 = -sig1
+        sig2 = max(abs(PlyStress[0][1]),abs(PlyStress[1][1])) # get max stress in 2 direction of ply
+        if -sig2 == min(PlyStress[0][1],PlyStress[1][1]): # value was negative
+          sig2 = -sig2
+        sig3 = max(abs(PlyStress[0][2]),abs(PlyStress[1][2])) # get stress in 6-direction
+        if -sig3 == min(PlyStress[0][2],PlyStress[1][2]): # value was negative
+          sig3 = -sig3
         fail = ft.MaxStress(sig1, sig2, sig3, s1c, s1t, s2c, s2t, s6) 
         Failures.append(fail)
     Failures = np.array(Failures) # convert to np array
@@ -123,12 +129,12 @@ def MaxStress(sig,strength):
 
 # %% A1. layup 1, Fx Max failure load
 # Get NM, first determine for layup 1 with Mx
-F = 700
+F = 656
 Mx = F*Ls/(4*b_s)# Mx = F L / 4 b
 NM1x = [0, 0, 0, Mx, 0, 0]# set NM for this load case
 sig_star = tt.CalculateStress(NM1x,C_star_laminate,z) # Use function stresses to get sigma*
 sig = tt.RotateMaterial(sig_star,layup1)# rotate stresses to material CS
-fail_ply,fails =  MaxStress(sig,strength) # determine failure ply and fail tests
+fail_ply,fails =  MaxStressTest(sig,strength) # determine failure ply and fail tests
 
 # %% A2. Determine failure ply for layup 1 My
 # calculate NM1y
@@ -213,7 +219,7 @@ def PlotStress(PlyStr, z, dir):
   PlyStrDirRow = np.reshape(PlyStrDir, (-1))  # get the stresses in one row
   xd = [[z,z]for z in z] # repeat the z coordinates twice
   xdRow = np.reshape(xd,-1) # reshape to one row
-  xdRow =  # reverse order
+  #xdRow =  # reverse order
   plt.plot(PlyStrDirRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
   return 
 #PlotStress(sig_star_2y,z,0)
