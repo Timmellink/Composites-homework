@@ -17,8 +17,8 @@ import TensileTest as tt
 df = pd.read_csv("3pb_data.txt", header=[0], sep='\s+')
 
 # %% set variables
-Ls = 100e-3 # sample span length
-b_s = 13e-3 # sample width
+Ls = 100e-3 # sample span length (meters)
+b_s = 13e-3 # sample width (meters)
 cd = {'E1' : 130e9,
       'E2' : 10e9,
       'G12' : 5.2e9,
@@ -27,11 +27,13 @@ cd = {'E1' : 130e9,
       'alp2' : 27.6e-6,
       't' : 0.15e-3 # ply thickness
       } # composite data
-sd = {'S1t' : 2280e6,
-      'S1c' : 1300e6,
-      'S2t' : 110e6,
-      'S2c' : 130e6,
-      'S6' : 205e6}# strength data 
+# strength data
+S1t =  2280e6
+S1c = 1300e6
+S2t = 110e6
+S2c =  130e6
+S6 =  205e6
+strength = (S1c,S1t,S2c,S2t,S6)
 layup1 = [45,0,-45,90]*3
 layup2 = [0]*3+[45,90,-45,-45,90,45,45,90,-45]
 n = len(layup1)*2 # number of plies
@@ -64,24 +66,23 @@ z = cp.ply_edges(cd['t'], n) # calculate ply edges
 ABD = cp.ABD_matrix(C_star_laminate, z)# Calculate ABD matrix
 abd = np.linalg.inv(ABD) # calculate abd
 
-# %%  Find Efx by analyzing d11
+# Find Efx by analyzing d11
 Efx = 12/(abd[3][3]*h**3) # Efx = 12/d11*h^3
 Efy = 12/(abd[4][4]*h**3) # Efy = 12/d22*h^3
 
-# %% repeat the procedure using second layup
+# repeat the procedure using second layup
 Cstar_lam2 = cp.Cstar_laminate(layup2,C) # first, calculate C*laminate 2
 ABD2 = cp.ABD_matrix(Cstar_lam2, z) # then calculate ABD using C*lam 2
 abd2 = np.linalg.inv(ABD2) # Then, calculate abd
 Efx2 = 12/(abd2[3][3]*h**3)
 Efy2 = 12/(abd2[4][4]*h**3)
 
-# %% compare the values
+# compare the values
 print("The found bending stiffness Efs [MPa]: ", Efs)
 print("The calculated Efx,1, Efy,1 : ", Efx, ", ", Efy)
 print("The calculated EFx,2, Efy,2 : ",Efx2, ", ", Efy2)
 
-# %%
-# Run max stress test 
+# %% max stress test 
 def MaxStress(sig,strength):
     """
     Check per ply whether it fails on MaxStress criterion
@@ -90,8 +91,8 @@ def MaxStress(sig,strength):
     ---------
     sig : matrix
       2xn matrix of stresses in material CS at start and end per layer
-    strength : dictionary
-      A 5 dimensional dictionary, containing s1c,s1t,s2c,s2t and s6
+    strength : tuple
+      A tuple containing s1c,s1t,s2c,s2t and s6
       strength : (S1c,S1t,S2c,S2t,S6)
  
     Returns
@@ -101,8 +102,7 @@ def MaxStress(sig,strength):
     Failures : array
       an array of booleans of whether each ply fails
     """
-    strength_list = [strength for direction, strength in strength.items()] # get s1c,s1t,s2c,s2t,s6 into a list
-    s1c,s1t,s2c,s2t,s6 = strength_list
+    s1c,s1t,s2c,s2t,s6 = strength
     Failures = []
     for StressArray in sig:
         sig1 = max(StressArray[0][0],StressArray[1][0]) # get maximum stress in 1-direction of ply
@@ -118,7 +118,7 @@ def MaxStress(sig,strength):
       fail_ply = n_lst[Failures==True][-1]
     else:
        print("No ply fails")
-       fail_ply = [0]
+       fail_ply = False
     return fail_ply,Failures
 
 # %% A1. layup 1, Fx Max failure load
@@ -128,7 +128,7 @@ Mx = F*Ls/(4*b_s)# Mx = F L / 4 b
 NM1x = [0, 0, 0, Mx, 0, 0]# set NM for this load case
 sig_star = tt.CalculateStress(NM1x,C_star_laminate,z) # Use function stresses to get sigma*
 sig = tt.RotateMaterial(sig_star,layup1)# rotate stresses to material CS
-fail_ply,fails =  MaxStress(sig,sd) # determine failure ply and fail tests
+fail_ply,fails =  MaxStress(sig,strength) # determine failure ply and fail tests
 
 # %% A2. Determine failure ply for layup 1 My
 # calculate NM1y
@@ -216,7 +216,7 @@ def PlotStress(PlyStr, z, dir):
   xdRow =  # reverse order
   plt.plot(PlyStrDirRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
   return 
-PlotStress(sig_star_2y,z,0)
+#PlotStress(sig_star_2y,z,0)
 """ 
 str2Material = MatStr[:,:,1] # stresses in 2 direction
 str2MaterialRow = np.reshape(str2Material, (-1))  # get the stresses in one row

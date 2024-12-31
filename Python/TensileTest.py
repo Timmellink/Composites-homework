@@ -89,16 +89,46 @@ def CalculateStress(NM,Cstar_laminate,z):
 #stresses = CalculateStress(Fx)
 
 # %% plot ply CS stresses
+def PlotPlyStress(NM, C_array,z, direc):
+    """
+    Plot stresses in ply CS in certain direction
+
+    Parameters
+    ----------
+    NM : array 
+        forces on ply per unit width
+    C_array : array
+        array of rotated Cstar matrices
+    z : array
+        n+1 array of ply edges
+    dir : scalar
+        direction to determine ply stress in (0, 1, or 2)
+
+    Returns
+    -------
+    null
+    """
+    # create graph space for one graph
+    dict1 =  {
+        '0' : 'x',
+        '1' : 'y',
+        '2' : 'z'} # dictionary of directions to plot stress in
+    graph, plot1 = plt.subplots(1,1)
+    stresses = CalculateStress(NM,C_array,z)
+    str1 = stresses[:,:,direc] # stresses in certain direction
+    str1Row = np.reshape(str1, (-1))  # get the stresses in one row
+    xd = [[z,z]for z in z] # repeat the elements twice
+    xdRow = np.reshape(xd,-1) # reshape to one row
+    plot1.plot(str1Row,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+    title = "stress distribution in "+dict1[str(direc)]+" direction"
+    plot1.set_title(title)
+    plot1.invert_yaxis()
+    return 
+
 Fx = 50e3 # Fx = 50kN
 Nx = Fx/W # determine NM vector
 NM = [Nx, 0, 0, 0, 0, 0]
-stresses = CalculateStress(NM,Cstar_laminate,z)
-str1 = stresses[:,:,0] # stresses in 1 direction
-str1Row = np.reshape(str1, (-1))  # get the stresses in one row
-xd = [[z,z]for z in z] # repeat the elements twice
-xdRow = np.reshape(xd,-1) # reshape to one row
-plt.close()
-plt.plot(str1Row,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+PlotPlyStress(NM, Cstar_laminate,z,0)
 
 # %% rotate back to material CS function
 def RotateMaterial(sig_star, layup):
@@ -178,6 +208,7 @@ MatStr = RotateMaterial(stress,layup)
 print("The plies that fail are number(s) #", n_lst[fail==True])
 
 # %% plot number of plies that fail
+"""
 def PlyBreak(leftBound,rightBound,n,strength,layup):
     n_lst = np.array(range(n))
     force_range = np.linspace(leftBound,rightBound,n)
@@ -189,24 +220,48 @@ def PlyBreak(leftBound,rightBound,n,strength,layup):
         n_fail_lst.append(n_fail)
     plt.plot(force_range,n_fail_lst)
     return 
-# %% plot stresses
-
-plt.close()
-str1Material = MatStr[:,:,0] # stresses in 1 direction
-str1MaterialRow = np.reshape(str1Material, (-1))  # get the stresses in one row
-xd = [[z,z]for z in z] # repeat the elements twice
-xdRow = np.reshape(xd,-1) # reshape to one row
-plt.plot(str1MaterialRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
 """
-str2Material = MatStr[:,:,1] # stresses in 2 direction
-str2MaterialRow = np.reshape(str2Material, (-1))  # get the stresses in one row
-plt.figure()
-plt.plot(str2MaterialRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+# %% plot material stresses
+def PlotMatStr(NM, Cstar_array, z, dir, layup):
+    """
+    Plot stresses in material CS
 
-str3Material = MatStr[:,:,2] # stresses in 3 direction
-str3MaterialRow = np.reshape(str3Material, (-1))  # get the stresses in one row
-plt.figure()
-plt.plot(str3MaterialRow,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
-"""
+    Parameters
+    ----------
+    NM : vector
+        Force vector
+    Cstar_array : array
+        array of rotated Cstar matrices
+    z : array
+        ply edges
+    dir : scalar
+        direction to plot stresses in
+    layup : array
+        array of angles of layup (one half)
+    """
+    dict = {
+        '0' : '1',
+        '1' : '2',
+        '2' : '6'
+    }
+    #plt.close()
+    plot = plt.figure()
+    stress=CalculateStress(NM,Cstar_array,z)
+    MatStr = RotateMaterial(stress,layup)
+    str1Material = MatStr[:,:,dir] # stresses in certain direction
+    str1MaterialRow = np.reshape(str1Material, (-1))  # get the stresses in one row
+    xd = [[z,z]for z in z] # repeat the elements twice
+    xdRow = np.reshape(xd,-1) # reshape to one row
+    plt.plot(str1MaterialRow,xdRow[1:-1],'r') #plot from top to bottom (only take begin and end once)
+    plt.axvline(x = 0, color = 'b', label = 'axvline - full height', linestyle = ':')
+    plt.ylim(max(xdRow[1:-1]), min(xdRow[1:-1]))
+    plt.title("stress in "+dict[str(dir)]+"-direction")
 
-# %%
+strength = (S1c,S1t,S2c,S2t,S6)
+Fx = 51.9e3 # Fx = 51.9kN
+Nx = Fx/W # determine NM vector
+NM = [Nx, 0, 0, 0, 0, 0]
+PlotMatStr(NM,Cstar_laminate,z,0,layup)
+PlotMatStr(NM,Cstar_laminate,z,1,layup)
+PlotMatStr(NM,Cstar_laminate,z,2,layup)
+

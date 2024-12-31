@@ -59,13 +59,21 @@ def MaxStress(sig1,sig2,sig6,s1c,s1t,s2c,s2t,s6):
     Params
     ------
     sig1 : scalar
+        stress in 1 direction
     sig2 : scalar
+        stress in 2 direction
     sig6 : scalar
+        shear stress
     s1c : scalar
+        compressive strength of fibers
     s1t : scalar
+        tensile strength of fibers
     s2c : scalar
+        compressive stress in 2 direction
     s2t : scalar
+        tensile strength in 2 direction
     s6 : scalar
+        shear strength
 
     Returns
     -------
@@ -75,7 +83,7 @@ def MaxStress(sig1,sig2,sig6,s1c,s1t,s2c,s2t,s6):
         #print("No failure in 1 direction")
         if (-s2c<sig2 and sig2<s2t):
             #print("No failure in 2 direction")
-            if sig6<s6:
+            if abs(sig6)<s6:
                 #print("No failure in 6 direction")
                 fail = False
             else:
