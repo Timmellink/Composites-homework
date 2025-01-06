@@ -4,12 +4,12 @@
 
 import numpy as np
 from CompositeProperties import transformation as t
-
+import CompositeProperties as cp
 
 
 def alpha_star(alpha_vec,theta):
     """
-    
+    Calculate alpha star array for single ply
 
     Parameters
     ----------
@@ -26,7 +26,7 @@ def alpha_star(alpha_vec,theta):
     """
     R = np.array([[1, 0, 0 ],[0, 1, 0],[0, 0, 2]])
     Ri = np.linalg.inv(R) # inverted R matrix
-    T = t.transformation(theta)
+    T = t(theta)
     Ti = np.linalg.inv(T)
     alpha_star_vec =  R@Ti@Ri@alpha_vec # R*T^-1*R^-1*alpha
     return alpha_star_vec
@@ -35,7 +35,7 @@ def alpha_star(alpha_vec,theta):
 
 def alpha_star_laminate(alph,thet):
     """
-    
+    Calculate alpha star array for laminate
 
     Parameters
     ----------
@@ -56,12 +56,31 @@ def alpha_star_laminate(alph,thet):
     alpha_array = [0]*n # python list
     # first calculate alpha coefficients for entire laminate
     for i in range(len(thet_lam)):
-        alpha_array[i] = ast.alpha_star(alph,thet_lam[i])
+        alpha_array[i] = alpha_star(alph,thet_lam[i])
     return alpha_array
 
 
 
-def calculate_NM_thermal(Cst,delta,alpha_r,z):
+def calculate_NM_thermal(Cst, delta, alpha_r, z):
+    """
+    Calculate Thermal forces NM^Th
+
+    Parameters
+    ---------
+    Cst : array
+        Rotated stiffness matrix for laminate
+    delta : scalar
+        Temperature difference 
+    alpha_r : array
+        alpha star array for laminate
+    z : array
+        Ply edges
+
+    Returns
+    -------
+    NM : array
+        Force vector for thermal forces
+    """
     lst1 = []
     lst2 = []
     if len(z) -1 == len(alpha_r):
@@ -84,3 +103,39 @@ def calculate_NM_thermal(Cst,delta,alpha_r,z):
         NM = np.append(N,M)
         return NM
         #N = [N+]
+
+def ThermalStress(NMth, alphaR, delta, Cstar, z):
+    """
+    Calculate thermal stresses (only taking into account thermal forces)
+
+    Parameters
+    ----------
+    NMth : array
+        Array of thermal forces
+    alphaR : array
+        Rotated thermal coefficients for laminate
+    delta : scalar
+        temperature difference
+    Cstar : array
+        rotated stiffness matrix laminate
+    z : array
+        ply edges
+
+    Returns
+    -------
+    ThStress : array 
+        matrix of thermal stresses for laminate
+    """
+    ABD = cp.ABD_matrix(Cstar, z)
+    abd = np.linalg.inv(ABD)
+    EpsK0 = NMth@abd
+    Eps0 = EpsK0[0:3] 
+    K0 = EpsK0[3:6]
+    n = len(alphaR)
+    ThStress = []
+    for i in range(n):
+        ThStress_b = Cstar[i]@(Eps0+z[i]*K0-alphaR[i]*delta)
+        ThStress_e = Cstar[i]@(Eps0+z[i+1]*K0-alphaR[i]*delta)
+        ThStress.append([ThStress_b, ThStress_e])
+    ThStress = np.array(ThStress)
+    return ThStress

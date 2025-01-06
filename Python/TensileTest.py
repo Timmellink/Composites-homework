@@ -102,7 +102,7 @@ def PlotPlyStress(NM, C_array,z, direc):
     z : array
         n+1 array of ply edges
     dir : scalar
-        direction to determine ply stress in (0, 1, or 2)
+        direction to determine ply stress in (0 : x, 1 : y, or 2 : z)
 
     Returns
     -------
