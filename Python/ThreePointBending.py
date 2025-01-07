@@ -205,9 +205,11 @@ tt.PlotPlyStress(NM2y,Cstar_lam2,z,1)
 
 # %% Calculate thermal stresses
 reload(te)
-AlphaStarArray = te.alpha_star_laminate(AlphaVec,layup2)
+AlphaStarArray = te.alpha_star_laminate(AlphaVec,layup2) # use of 2nd layup
 NM_th = te.calculate_NM_thermal(Cstar_lam2, delta, AlphaStarArray, z)
-SigTh = te.ThermalStress(NM_th, AlphaStarArray, delta, Cstar_lam2, z)
+SigTh = te.ThermalStress(NM_th, AlphaStarArray, delta, Cstar_lam2, z) # stresses in ply CS
+SigThMat = tt.RotateMaterial(SigTh, layup2) # rotate thermal stresses to material CS
+SigThMat = np.round(SigThMat,7)
 def PlotThermalStress(SigTh, dir, z):
   """
     Plot thermal stresses in ply CS in certain direction
@@ -226,19 +228,21 @@ def PlotThermalStress(SigTh, dir, z):
     null
     """
   dict1 =  {
-      '0' : 'x',
-      '1' : 'y',
-      '2' : 'z'
+      '0' : '1',
+      '1' : '2',
+      '2' : '3'
     } # dictionary of directions to plot stress in
   graph, plot1 = plt.subplots(1,1) # create graph space for one graph
   StressArray = SigTh[:,:,dir] # stresses in certain direction
   StrR = np.reshape(StressArray, (-1))  # get the stresses in one row
-  zD = [[z,z]for z in z] # repeat the elements twice
+  zD = [[z,z] for z in z] # repeat the elements twice
   zDR = np.reshape(zD,-1) # reshape to one row
   plot1.plot(StrR,zDR[1:-1]) #plot from top to bottom (only take begin and end once)
   title = "stress distribution in "+dict1[str(dir)]+" direction"
   plot1.set_title(title)
   plot1.invert_yaxis()
   return 
-PlotThermalStress(SigTh,0,z)
+#PlotThermalStress(SigTh,0,z)
+PlotThermalStress(SigThMat,0,z)
+PlotThermalStress(SigThMat,1,z)
 # %%
