@@ -102,7 +102,6 @@ def calculate_NM_thermal(Cst, delta, alpha_r, z):
         M = delta/2*np.sum(Mx,axis=0)
         NM = np.append(N,M)
         return NM
-        #N = [N+]
 
 def ThermalStress(NMth, alphaR, delta, Cstar, z):
     """

@@ -1,3 +1,7 @@
+import CompositeProperties as cp
+import numpy as np
+from importlib import reload
+
 # functions to test on ply failure
 def TestStress(val):
     """
@@ -97,3 +101,42 @@ def MaxStress(sig1,sig2,sig6,s1c,s1t,s2c,s2t,s6):
         fail = True
     return fail
 
+def TsaiTest(NM,layup,strength,Cstar_lam,t):
+    """
+    Check per ply whether it fails on Tsai-hill test
+
+    Parameters
+    ---------
+    NM : vector
+        NM vector (Newton/unit width)
+    layup : array
+        layup of angles in laminate of one half.
+    strength : tuple
+        A 5 dimensional tuple, containing s1c,s1t,s2c,s2t and s6
+        strength : (S1c,S1t,S2c,S2t,S6)
+    Cstar_lam : array
+        rotated stiffness matrix
+    t : scalar
+        ply thickness
+
+    Returns
+    -------
+    Failures : array
+        an array of booleans of whether each ply fails
+    """
+    reload(cp)
+    n = len(layup)*2
+    #h = t*n
+    z = cp.ply_edges(t,n)
+    s1c,s1t,s2c,s2t,s6 = strength
+    stresses = cp.CalculateStress(NM,Cstar_lam,z)
+    MaterialStresses = cp.RotateMaterial(stresses,layup)
+    Failures = []
+    for StressArray in MaterialStresses:
+        sig1 = StressArray[0][0] # get stress in 1-direction at start ply
+        sig2 = StressArray[0][1] # get stress in 2 direction at start ply
+        sig3 = StressArray[0][2] # get stress in 6-direction
+        fail = TsaiHill(sig1, sig2, sig3, s1c, s1t, s2c, s2t, s6) 
+        Failures.append(fail)
+    Failures = np.array(Failures) # convert to np array
+    return Failures
