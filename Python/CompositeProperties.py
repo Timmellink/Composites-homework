@@ -130,7 +130,7 @@ def Cstar(C, theta):
 
 
 
-def Cstar_laminate(theta_array, C):
+def Cstar_laminate(theta_array, C, s):
     """
     Cstar_laminate returns array of C_star matrices
     
@@ -141,9 +141,8 @@ def Cstar_laminate(theta_array, C):
         (expects a symmetrical array, so only one half of the layup)
     C : matrix
         Stiffness matrix of one ply in material CS
-    n : scalar
-        Number of plies
-        
+    s : boolean
+        A boolean (0 or 1) of whether the layup is symmetric or not
     
      Returns
      -------
@@ -152,7 +151,10 @@ def Cstar_laminate(theta_array, C):
     """
 
     #array = [None] * n  # set up array
-    layup = theta_array + theta_array[::-1]
+    if s:
+        layup = theta_array + theta_array[::-1]
+    else:  
+        layup = theta_array
     array  = [Cstar(C,angle) for angle in layup] 
     # fill array with C*s according to angle in symmetric layup
   #  for angle,index in zip(layup,range(n)):

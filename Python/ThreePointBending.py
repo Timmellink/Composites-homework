@@ -86,51 +86,6 @@ print("The found bending stiffness Efs [MPa]: ", Efs)
 print("The calculated Efx,1, Efy,1 : ", Efx, ", ", Efy)
 print("The calculated EFx,2, Efy,2 : ",Efx2, ", ", Efy2)
 
-# %% max stress test 
-def MaxStressTest(sig,strength):
-    """
-    Check per ply whether it fails on MaxStress criterion
-
-    Parameters
-    ---------
-    sig : matrix
-      2xn matrix of stresses in material CS at start and end per layer
-    strength : tuple
-      A tuple containing s1c,s1t,s2c,s2t and s6
-      strength : (S1c,S1t,S2c,S2t,S6)
- 
-    Returns
-    -------
-    fail_ply : scalar
-      number of last ply in laminate that fails
-    Failures : array
-      an array of booleans of whether each ply fails
-    """
-    s1c,s1t,s2c,s2t,s6 = strength
-    Failures = []
-    for PlyStress in sig:
-        sig1 = max(abs(PlyStress[0][0]),abs(PlyStress[1][0])) # get maximum stress in 1-direction of ply
-        if -sig1 == min(PlyStress[0][0],PlyStress[1][0]): # value was negative
-          sig1 = -sig1
-        sig2 = max(abs(PlyStress[0][1]),abs(PlyStress[1][1])) # get max stress in 2 direction of ply
-        if -sig2 == min(PlyStress[0][1],PlyStress[1][1]): # value was negative
-          sig2 = -sig2
-        sig3 = max(abs(PlyStress[0][2]),abs(PlyStress[1][2])) # get stress in 6-direction
-        if -sig3 == min(PlyStress[0][2],PlyStress[1][2]): # value was negative
-          sig3 = -sig3
-        fail = ft.MaxStress(sig1, sig2, sig3, s1c, s1t, s2c, s2t, s6) 
-        Failures.append(fail)
-    Failures = np.array(Failures) # convert to np array
-    n = len(sig) # get number of plies
-    n_lst = np.array(range(n)) # get list of ply numbers
-    if (len(n_lst[Failures==True])>=1):
-      FailList = n_lst[Failures ==True]
-      FailPly = FailList[0] + 1
-      print("The ply that fails is number #", FailPly) # print which ply fails
-    else:
-       print("No ply fails")
-       FailPly = False
-    return FailPly,Failures
 
 # %% A1. layup 1, Fx Max failure load
 # Get NM, first determine for layup 1 with Mx
