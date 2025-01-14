@@ -32,7 +32,7 @@ R = 15e-2
 reload(cp)
 C = cp.stiffness(E1,E2,nu12,G12) # calculate stiffness C
 z = cp.ply_edges(t,n)# calculate z ply edges
-Clam = cp.Cstar_laminate(layup, C, 1)# calculate cstar_lam
+Clam = cp.Cstar_laminate(layup, C)# calculate cstar_lam
 ABD = cp.ABD_matrix(Clam, z)# calculate ABD
 abd = np.linalg.inv(ABD)# calculate abd
 
@@ -55,4 +55,10 @@ Nx_max = Pmax*R/2 # calculate Nx
 Ny_max = Pmax*R # Calculate Ny 
 NM_max = [Nx_max, Ny_max, 0, 0, 0, 0] # set NM
 Fails = ft.MaxStressTest(NM_max, layup, strength, Clam, t)
+
+# %% Calculate Clam2
+reload(cp)
+layup2 = [45,-45]# set layup2
+Clam2 = cp.Cstar_laminate(layup2, C)# calculate Clam2
+Fails2 = ft.MaxStressTest(NM_max, layup2, strength, Clam2, t)# do fail test with layup2
 # %%
