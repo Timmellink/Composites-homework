@@ -166,8 +166,8 @@ def MaxStressTest(NM, layup, strength, Cstar_lam, t):
 
     Returns
     -------
-    fails : list
-        List of boolean values for failures per ply
+    fails : array
+        numpy array of boolean values for failures per ply
     """
 
     n = len(layup)*2
@@ -206,6 +206,7 @@ def MaxStressTest(NM, layup, strength, Cstar_lam, t):
         print("No ply fails according to Max Stress test.")
     else:
         print("The laminate fails according to Max Stress criterion.")
+    Fails = np.array(Fails)
     return Fails
 
 def MaxStressTestPlyFail(sig,strength):

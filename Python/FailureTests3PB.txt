@@ -1,64 +1,16 @@
 tested layup : layup 1, moment : Mx
 Failure load : 656N
-ply that failed : 2
+ply that failed : [2]
 
 tested layup : layup 1, moment : My
 Failure load : 613N
-ply that failed : 23
+ply that failed : [23]
 
 tested layup : layup 2, moment : Mx
 Failure load : 961N
-ply that failed : 1
+ply that failed : [1]
 
 tested layup : layup 2, moment : My
 Failure load : 439N
-ply that failed : 24
-
-tested layup : layup 1, moment : Mx
-Failure load : 656N
-ply that failed : 2
-
-tested layup : layup 1, moment : My
-Failure load : 613N
-ply that failed : 23
-
-tested layup : layup 2, moment : Mx
-Failure load : 961N
-ply that failed : 1
-
-tested layup : layup 2, moment : My
-Failure load : 439N
-ply that failed : 24
-
-tested layup : layup 1, moment : Mx
-Failure load : 656N
-ply that failed : 2
-
-tested layup : layup 1, moment : My
-Failure load : 613N
-ply that failed : 23
-
-tested layup : layup 2, moment : Mx
-Failure load : 961N
-ply that failed : 1
-
-tested layup : layup 2, moment : My
-Failure load : 439N
-ply that failed : 24
-
-tested layup : layup 1, moment : Mx
-Failure load : 656N
-ply that failed : 2
-
-tested layup : layup 1, moment : My
-Failure load : 613N
-ply that failed : 23
-
-tested layup : layup 2, moment : Mx
-Failure load : 961N
-ply that failed : 1
-
-tested layup : layup 2, moment : My
-Failure load : 439N
-ply that failed : 24
+ply that failed : [24]
 

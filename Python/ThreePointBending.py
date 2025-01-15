@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import CompositeProperties as cp
 import FailTest as ft
-import TensileTest as tt
+#import TensileTest as tt
 import thermal_effects as te
 from importlib import reload
 
@@ -89,49 +89,64 @@ print("The calculated EFx,2, Efy,2 : ",Efx2, ", ", Efy2)
 
 # %% A1. layup 1, Fx Max failure load
 # Get NM, first determine for layup 1 with Mx
+reload(ft)
 F = 656
 Mx = F*Ls/(4*b_s)# Mx = F L / 4 b
 NM1x = [0, 0, 0, Mx, 0, 0]# set NM for this load case
-sig_star = tt.CalculateStress(NM1x,C_star_laminate,z) # Use function stresses to get sigma*
-sig = tt.RotateMaterial(sig_star,layup1)# rotate stresses to material CS
-fail_ply,fails =  MaxStressTest(sig,strength) # determine failure ply and fail tests
+sig_star = cp.CalculateStress(NM1x,C_star_laminate,z) # Use function stresses to get sigma*
+sig = cp.RotateMaterial(sig_star,layup1)# rotate stresses to material CS
+fails =  ft.MaxStressTest(NM1x, layup1, strength, C_star_laminate, cd['t']) # determine failure ply and fail tests
+n_lst = np.array(range(n))
+fail_ply_1x = n_lst[fails==True]
+fail_ply_1x += 1 
+print("The ply that fails is number: ", fail_ply_1x)
 
 # %% A2. Determine failure ply for layup 1 My
 # calculate NM1y
 F1y = 613
 M1y = F1y*Ls/(4*b_s)# Mx = F L / 4 b
 NM1y = [0, 0, 0, 0, M1y, 0]# set NM for this load case
-sig_star_1y = tt.CalculateStress(NM1y,C_star_laminate,z) # Use function stresses with C*lam1 to get sigma*
-sig_1y = tt.RotateMaterial(sig_star_1y,layup1)# rotate stresses to material CS
+sig_star_1y = cp.CalculateStress(NM1y,C_star_laminate,z) # Use function stresses with C*lam1 to get sigma*
+sig_1y = cp.RotateMaterial(sig_star_1y,layup1)# rotate stresses to material CS
 print("Tested force (F1y): ",str(F1y), "N")
-fail_ply_1y,fails_1y =  MaxStressTest(sig_1y,strength) # determine failure ply and fail tests
+fails_1y =  ft.MaxStressTest(NM1y, layup1, strength, C_star_laminate, cd['t']) # determine failure ply and fail tests
+fail_ply_1y = n_lst[fails_1y==True]
+fail_ply_1y += 1 
+print("The ply that fails is number: ", fail_ply_1y)
 
 # %% A3. Determine failure ply for layup 2 Mx
 # calculate NM2x
 F2x = 961 # N
 M2x = F2x*Ls/(4*b_s)# Mx = F L / 4 b
 NM2x = [0, 0, 0, M2x, 0, 0]# set NM for this load case
-sig_star_2x = tt.CalculateStress(NM2x,Cstar_lam2,z) # Use function stresses with C*lam1 to get sigma*
-sig_2x = tt.RotateMaterial(sig_star_2x,layup2)# rotate stresses to material CS
+sig_star_2x = cp.CalculateStress(NM2x,Cstar_lam2,z) # Use function stresses with C*lam1 to get sigma*
+sig_2x = cp.RotateMaterial(sig_star_2x,layup2)# rotate stresses to material CS
 print("Tested force (F2x): ",str(F2x), "N")
-fail_ply_2x,fails_2x =  MaxStressTest(sig_2x,strength) # determine failure ply and fail tests
+fails_2x =  ft.MaxStressTest(NM2x, layup2, strength, Cstar_lam2, cd['t']) # determine failure ply and fail tests
+fail_ply_2x = n_lst[fails_2x==True]
+fail_ply_2x += 1 
+print("The ply that fails is number: ", fail_ply_2x)
 
 # %% A4. Determine failure ply for layup 2 My
 # calculate NM2y
 F2y = 439
 M2y = F2y*Ls/(4*b_s) # My = F L / 4 b
 NM2y = [0, 0, 0, 0, M2y, 0]# set NM for this load case
-sig_star_2y = tt.CalculateStress(NM2y,Cstar_lam2,z) # Use function stresses with C*lam1 to get sigma*
-sig_2y = tt.RotateMaterial(sig_star_2y,layup2)# rotate stresses to material CS
+sig_star_2y = cp.CalculateStress(NM2y,Cstar_lam2,z) # Use function stresses with C*lam1 to get sigma*
+sig_2y = cp.RotateMaterial(sig_star_2y,layup2)# rotate stresses to material CS
 print("Tested force (F2y): ",str(F2y), "N")
-fail_ply_2y,fails_2y =  MaxStressTest(sig_2y,strength) # determine failure ply and fail tests
-
+fails_2y =  ft.MaxStressTest(NM2y, layup2, strength, Cstar_lam2, cd['t']) # determine failure ply and fail tests
+fail_ply_2y = n_lst[fails_2y==True]
+fail_ply_2y += 1 
+print("The ply that fails is number: ", fail_ply_2y)
 
 # %% R1. Report on found values layup1, Mx
-f = open("FailureTests3PB.txt", "a")# create new txt file
+f = open("FailureTests3PB.txt", "r+")# create new txt file, erase contents
+f.truncate(0) # need '0' when using r+
+
 f.write("tested layup : layup 1, moment : Mx")# will record tested layup and which moment (Mx or My)
 f.write("\nFailure load : "+str(F)+"N")# Record failure load
-f.write("\nply that failed : "+str(fail_ply)+"\n\n")# Record which ply fails first
+f.write("\nply that failed : "+str(fail_ply_1x)+"\n\n")# Record which ply fails first
 f.close()# close file
 
 # %% R2. Report on found values layup1, My
@@ -156,48 +171,18 @@ f.write("\nply that failed : "+str(fail_ply_2y)+"\n\n")# Record which ply fails 
 f.close()# close file
 
 # %% plot stress in longitudinal direction (layup 2, y direction)
-tt.PlotPlyStress(NM2y,Cstar_lam2,z,1)
+reload(cp)
+cp.PlotPlyStress(NM2y,Cstar_lam2,z,1)
 
 # %% Calculate thermal stresses
 reload(te)
 AlphaStarArray = te.alpha_star_laminate(AlphaVec,layup2) # use of 2nd layup
 NM_th = te.calculate_NM_thermal(Cstar_lam2, delta, AlphaStarArray, z)
 SigTh = te.ThermalStress(NM_th, AlphaStarArray, delta, Cstar_lam2, z) # stresses in ply CS
-SigThMat = tt.RotateMaterial(SigTh, layup2) # rotate thermal stresses to material CS
+SigThMat = cp.RotateMaterial(SigTh, layup2) # rotate thermal stresses to material CS
 SigThMat = np.round(SigThMat,7)
-def PlotThermalStress(SigTh, dir, z):
-  """
-    Plot thermal stresses in ply CS in certain direction
 
-    Parameters
-    ----------
-    SigTh : array 
-        Thermal stresses array (contains stresses at start and end of ply)
-    dir : scalar
-        direction to determine ply stress in (0 : 1, 1 : 2, or 2 : 3)
-    z : array
-          n+1 array of ply edges
-
-    Returns
-    -------
-    null
-    """
-  dict1 =  {
-      '0' : '1',
-      '1' : '2',
-      '2' : '3'
-    } # dictionary of directions to plot stress in
-  graph, plot1 = plt.subplots(1,1) # create graph space for one graph
-  StressArray = SigTh[:,:,dir] # stresses in certain direction
-  StrR = np.reshape(StressArray, (-1))  # get the stresses in one row
-  zD = [[z,z] for z in z] # repeat the elements twice
-  zDR = np.reshape(zD,-1) # reshape to one row
-  plot1.plot(StrR,zDR[1:-1]) #plot from top to bottom (only take begin and end once)
-  title = "stress distribution in "+dict1[str(dir)]+" direction"
-  plot1.set_title(title)
-  plot1.invert_yaxis()
-  return 
 #PlotThermalStress(SigTh,0,z)
-PlotThermalStress(SigThMat,0,z)
-PlotThermalStress(SigThMat,1,z)
+te.PlotThermalStress(SigThMat,0,z)
+te.PlotThermalStress(SigThMat,1,z)
 # %%

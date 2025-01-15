@@ -7,7 +7,7 @@ Created on Thu Dec  5 17:19:37 2024
 
 # module containing all relevant functions for calculation of laminate properties
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def ply_edges(h,n):
     """
@@ -267,3 +267,76 @@ def RotateMaterial(sig_star, layup):
     MaterialStresses = np.array(MaterialStresses) # convert material stresses to numpy array
 
     return MaterialStresses
+
+def PlotPlyStress(NM, C_array,z, direc):
+    """
+    Plot stresses in ply CS in certain direction
+
+    Parameters
+    ----------
+    NM : array 
+        forces on ply per unit width
+    C_array : array
+        array of rotated Cstar matrices
+    z : array
+        n+1 array of ply edges
+    dir : scalar
+        direction to determine ply stress in (0 : x, 1 : y, or 2 : z)
+
+    Returns
+    -------
+    null
+    """
+    # create graph space for one graph
+    dict1 =  {
+        '0' : 'x',
+        '1' : 'y',
+        '2' : 'z'} # dictionary of directions to plot stress in
+    graph, plot1 = plt.subplots(1,1)
+    stresses = CalculateStress(NM,C_array,z)
+    str1 = stresses[:,:,direc] # stresses in certain direction
+    str1Row = np.reshape(str1, (-1))  # get the stresses in one row
+    xd = [[z,z]for z in z] # repeat the elements twice
+    xdRow = np.reshape(xd,-1) # reshape to one row
+    plot1.plot(str1Row,xdRow[1:-1]) #plot from top to bottom (only take begin and end once)
+    title = "stress distribution in "+dict1[str(direc)]+" direction"
+    plot1.set_title(title)
+    plot1.invert_yaxis()
+    return 
+
+def PlotMatStr(NM, Cstar_array, z, dir, layup):
+    """
+    Plot stresses in material CS
+
+    Parameters
+    ----------
+    NM : vector
+        Force vector
+    Cstar_array : array
+        array of rotated Cstar matrices
+    z : array
+        ply edges
+    dir : scalar
+        direction to plot stresses in
+    layup : array
+        array of angles of layup (one half)
+    """
+    dict = {
+        '0' : '1',
+        '1' : '2',
+        '2' : '6'
+    }
+    #plt.close()
+    plot = plt.figure()
+    stress= CalculateStress(NM,Cstar_array,z)
+    MatStr = RotateMaterial(stress,layup)
+    str1Material = MatStr[:,:,dir] # stresses in certain direction
+    str1MaterialRow = np.reshape(str1Material, (-1))  # get the stresses in one row
+    xd = [[z,z]for z in z] # repeat the elements twice
+    xdRow = np.reshape(xd,-1) # reshape to one row
+    plt.plot(str1MaterialRow,xdRow[1:-1],'r') #plot from top to bottom (only take begin and end once)
+    plt.axvline(x = 0, color = 'b', label = 'axvline - full height', linestyle = ':')
+    plt.ylim(max(xdRow[1:-1]), min(xdRow[1:-1]))
+    plt.title("stress in "+dict[str(dir)]+"-direction")
+
+    return

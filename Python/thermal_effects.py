@@ -5,7 +5,7 @@
 import numpy as np
 from CompositeProperties import transformation as t
 import CompositeProperties as cp
-
+import matplotlib.pyplot as plt
 
 def alpha_star(alpha_vec,theta):
     """
@@ -138,3 +138,36 @@ def ThermalStress(NMth, alphaR, delta, Cstar, z):
         ThStress.append([ThStress_b, ThStress_e])
     ThStress = np.array(ThStress)
     return ThStress
+
+def PlotThermalStress(SigTh, dir, z):
+  """
+    Plot thermal stresses in ply CS in certain direction
+
+    Parameters
+    ----------
+    SigTh : array 
+        Thermal stresses array (contains stresses at start and end of ply)
+    dir : scalar
+        direction to determine ply stress in (0 : 1, 1 : 2, or 2 : 3)
+    z : array
+          n+1 array of ply edges
+
+    Returns
+    -------
+    null
+    """
+  dict1 =  {
+      '0' : '1',
+      '1' : '2',
+      '2' : '3'
+    } # dictionary of directions to plot stress in
+  graph, plot1 = plt.subplots(1,1) # create graph space for one graph
+  StressArray = SigTh[:,:,dir] # stresses in certain direction
+  StrR = np.reshape(StressArray, (-1))  # get the stresses in one row
+  zD = [[z,z] for z in z] # repeat the elements twice
+  zDR = np.reshape(zD,-1) # reshape to one row
+  plot1.plot(StrR,zDR[1:-1]) #plot from top to bottom (only take begin and end once)
+  title = "stress distribution in "+dict1[str(dir)]+" direction"
+  plot1.set_title(title)
+  plot1.invert_yaxis()
+  return 
