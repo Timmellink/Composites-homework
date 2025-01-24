@@ -84,24 +84,18 @@ def calculate_NM_thermal(Cst, delta, alpha_r, z):
     lst1 = []
     lst2 = []
     if len(z) -1 == len(alpha_r):
-       # for i in alpha_r:
-        #    Ni = Cst[i]*alpha_r[i]*(z[i+1]-z[i])
-         #   lst1.append(Ni)
         for i in range(len(alpha_r)):
             Ni = Cst[i]@alpha_r[i]*(z[i+1]-z[i])
             lst1.append(Ni)
             Mi = Cst[i]@alpha_r[i]*(z[i+1]**2-z[i]**2)
             lst2.append(Mi)
-        #Nx = [Cst[i]@alpha_r[i]*(z[i+1]-z[i]) for i in alpha_r] # calculation of each Nth force of each layer
-        #Mx = [Cst[i]@alpha_r[i]*(z[i+1]**2-z[i]**2) for i in alpha_r] # calculation of the Mth force of each layer
-        #Nx = np.array(Nx) # convert to numpy array for faster computation
-        #Mx = np.array(Mx)
         Nx = np.array(lst1)
         Mx = np.array(lst2)
         N = delta*np.sum(Nx,axis=0) # sum the forces, multiplied by the temperature difference
         M = delta/2*np.sum(Mx,axis=0)
         NM = np.append(N,M)
-        return NM
+        NM = np.round(NM,9)
+    return NM
 
 def ThermalStress(NMth, alphaR, delta, Cstar, z):
     """
@@ -139,9 +133,9 @@ def ThermalStress(NMth, alphaR, delta, Cstar, z):
     ThStress = np.array(ThStress)
     return ThStress
 
-def PlotThermalStress(SigTh, dir, z):
+def PlotThermalStress(SigTh, direc, z):
   """
-    Plot thermal stresses in ply CS in certain direction
+    Plot thermal stresses in certain direction
 
     Parameters
     ----------
@@ -162,12 +156,12 @@ def PlotThermalStress(SigTh, dir, z):
       '2' : '3'
     } # dictionary of directions to plot stress in
   graph, plot1 = plt.subplots(1,1) # create graph space for one graph
-  StressArray = SigTh[:,:,dir] # stresses in certain direction
+  StressArray = SigTh[:,:,direc] # stresses in certain direction
   StrR = np.reshape(StressArray, (-1))  # get the stresses in one row
   zD = [[z,z] for z in z] # repeat the elements twice
   zDR = np.reshape(zD,-1) # reshape to one row
   plot1.plot(StrR,zDR[1:-1]) #plot from top to bottom (only take begin and end once)
-  title = "stress distribution in "+dict1[str(dir)]+" direction"
+  title = "stress distribution in "+dict1[str(direc)]+" direction"
   plot1.set_title(title)
   plot1.invert_yaxis()
   return 

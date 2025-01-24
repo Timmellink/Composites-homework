@@ -9,13 +9,13 @@ Created on Thu Dec  5 17:19:37 2024
 import numpy as np
 import matplotlib.pyplot as plt
 
-def ply_edges(h,n):
+def ply_edges(z,n):
     """
     ply_edges returns ply top and bottom surface locations
     
     Parameters
     ----------
-    h : scalar 
+    z : scalar 
         ply thickness
     n : scalar 
         Number of layers
@@ -26,15 +26,7 @@ def ply_edges(h,n):
     z : array
         Array of length n+1 with locations of ply
     """
-    # ply edges returns ply top and bottom surface locations
-    #
-    # Arguments:
-    #  h: ply thickness
-    #  n : number of plies
-    #
-    # Output:
-    #  z: array of length n+1 with locations of ply
-    z = np.linspace(-n*h/2,n*h/2,n+1)
+    z = np.linspace(-n*z/2,n*z/2,n+1)
     return z
 
 

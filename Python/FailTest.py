@@ -187,7 +187,7 @@ def MaxStressTest(NM, layup, strength, Cstar_lam, t):
 
         # get maximum stress for direction 2
         MaxVal2 = max(abs(sig_vec[0][1]),abs(sig_vec[1][1])) # get max stress in 2 direction of ply
-        MinVal2 = min(sig_vec[0][1],sig_vec[1][1])# get lowest stress value for direction 2
+        MinVal2 = min(sig_vec[0][1],sig_vec[1][1]) # get lowest stress value for direction 2
         if MaxVal2 == -MinVal2: # value was negative
           MaxSig2 = -MaxVal2
         else:
@@ -241,7 +241,7 @@ def MaxStressTestPlyFail(sig,strength):
         sig3 = max(abs(PlyStress[0][2]),abs(PlyStress[1][2])) # get stress in 6-direction
         if -sig3 == min(PlyStress[0][2],PlyStress[1][2]): # value was negative
           sig3 = -sig3
-        fail = ft.MaxStress(sig1, sig2, sig3, s1c, s1t, s2c, s2t, s6) 
+        fail = MaxStress(sig1, sig2, sig3, s1c, s1t, s2c, s2t, s6) 
         Failures.append(fail)
     Failures = np.array(Failures) # convert to np array
     n = len(sig) # get number of plies
