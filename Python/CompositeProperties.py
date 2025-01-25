@@ -71,7 +71,7 @@ def transformation(theta):
      Parameters
      ----------
      theta : scalar 
-        angle of ply
+        angle of ply (in degrees)
         
     
      Returns
