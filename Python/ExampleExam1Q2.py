@@ -56,19 +56,22 @@ A21 = ABD[1][0]
 eps1 = 0.01
 #Pmax = 2/(3*R)*eps1*(A11+A21)
 
+# %% solution max pressure
+a = abd[0:3,0:3]
 Re = np.array([[1,0,0],[0,1,0],[0,0,2]]) 
 Rinv = np.linalg.inv(Re)
 T = cp.transformation(-45)
-K = Re@T@Rinv
+K = Re@T@Rinv@a
 K11 = K[0][0]
 K12 = K[0][1]
-P_max = eps1/(R*(a11*K11/2+a12*K12))
+P_max = eps1/(R*(K11/2+K12))
 
 print(f"The max. allowed value for P is : {P_max*1e-5} bar")
 
-sig_x_max = P_max*R/(2*h)
-sig_theta_max = P_max*R/h
-Nxm = sig_x_max*h
-Nym = sig_theta_max*h
-N = [Nxm, Nym, 0]
-eps = K@N
+#sig_x_max = P_max*R/(2*h)
+#sig_theta_max = P_max*R/h
+#Nxm = sig_x_max*h
+#Nym = sig_theta_max*h
+#N = [Nxm, Nym, 0]
+#eps = K@N
+# %%
