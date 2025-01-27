@@ -9,6 +9,40 @@ Created on Thu Dec  5 17:19:37 2024
 import numpy as np
 import matplotlib.pyplot as plt
 
+def nPlies(layup):
+    """
+    Returns number of plies for a symmetric layup
+
+    Parameters
+    ----------
+    layup : array
+        Array of layup.
+
+    Returns
+    -------
+    n : scalar
+        Number of plies in laminate.
+
+    """
+    return len(layup)*2
+
+def inv(matrix):
+    """
+    Invert matrix or vector
+
+    Parameters
+    ----------
+    matrix : matrix
+        input matrix.
+
+    Returns
+    -------
+    matrix
+        inverted matrix.
+
+    """
+    return np.linalg.inv(matrix)
+
 def ply_edges(z,n):
     """
     ply_edges returns ply top and bottom surface locations
@@ -190,7 +224,7 @@ def ABD_matrix(Carray, z):
     AB = np.concatenate((A,B),axis=1)
     BD = np.concatenate((B,D),axis=1)
     ABD = np.vstack((AB, BD))
-    ABD = np.round(ABD,8)
+    ABD = np.round(ABD,9)
     return ABD
 
 # %% calculate stresses in ply CS function
