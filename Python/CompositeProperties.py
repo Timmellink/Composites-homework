@@ -126,6 +126,7 @@ def transformation(theta):
     a32 = m*n
     a33 = m**2-n**2
     T = np.array([[a11, a12, a13], [a21, a22, a23], [a31, a32, a33]])
+    T = np.round(T,7)
     return T    
 
 

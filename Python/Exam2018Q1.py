@@ -29,9 +29,10 @@ C = cp.stiffness(E1, E2, nu12, G12)
 Cstar_lam = cp.Cstar_laminate(layup, C)
 n = cp.nPlies(layup)
 z = cp.ply_edges(t, n)
-ABD = cp.ABD_matrix(layup, z)
+ABD = cp.ABD_matrix(Cstar_lam, t)
 abd = cp.inv(ABD)
 # %% calculate NMth and eps
+
 alpha_vec = [alph1, alph2, 0]
 alpha_star = te.alpha_star_laminate(alpha_vec, layup)
-NMth = te.calculate_NM_thermal(Cstar_lam, deltaT, alpha_star, z)
+NMth = te.calculate_NM_thermal(Cstar_lam, deltaT, alpha_star, t)
