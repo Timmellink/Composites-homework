@@ -14,6 +14,7 @@ import FailTest as ft
 from importlib import reload
 
 # %% Tensile test variables
+
 L = 250e-3 # m
 W = 25e-3 # m
 layup = [45,0,-45,90]*3
